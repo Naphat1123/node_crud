@@ -56,6 +56,9 @@
                                                     <%= data[i].author %>
                                                 </td>
                                                 <td>
+                                                    <a download='<%= data[i].file_name %>' href="<%= data[i].file_name %>"><%= data[i].file_name %></a>
+                                                </td>
+                                                <td>
                                                     <a href="../books/edit/<%= data[i].id %>"
                                                         class="btn btn-success edit">Edit</a>
                                                     <a href="../books/delete/<%= data[i].id %>"

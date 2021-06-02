@@ -2,6 +2,11 @@ const e = require("express");
 let express = require("express");
 let router = express.Router();
 let dbCon = require("../lib/db");
+const upload = require("express-fileupload");
+const path = require("path");
+
+router.use(upload());
+router.use(express.static("upload"));
 
 //  display books page
 
@@ -27,10 +32,24 @@ router.get("/add", (req, res, next) => {
 
 // add new books
 router.post("/add", (req, res, next) => {
+  //เก็บตัวแปรจากฟอร์ม input
   let name = req.body.name;
   let author = req.body.author;
-  let error = false;
+  var file = req.files.file;
+  let uploadPath ="upload/" + file.name;
+  let err = false;
 
+  if (req.files) {
+    console.log(req.files);
+    var filename = file.name;
+    console.log(filename);
+
+    file.mv(uploadPath, (err) => {
+      if (err) {
+        res.send(err);
+      }
+    });
+  }
   if (name.length === 0 || author.length === 0) {
     error = true;
     // set flash msg
@@ -39,13 +58,16 @@ router.post("/add", (req, res, next) => {
     res.render("books/add", {
       name: name,
       author: author,
+      file_name: filename,
     });
   }
+
   //insert data
-  if (!error) {
+  if (!err) {
     let form_data = {
       name: name,
       author: author,
+      file_name: filename,
     };
 
     // insert query
@@ -56,10 +78,11 @@ router.post("/add", (req, res, next) => {
         res.render("books/add", {
           name: form_data.name,
           author: form_data.author,
+          file_name: form_data.file_name,
         });
       } else {
         req.flash("success", "books success added");
-        res.redirect("/books");
+        // res.redirect("/books");
       }
     });
   }
@@ -123,7 +146,7 @@ router.post("/update/:id", (req, res, next) => {
           });
         } else {
           req.flash("success", "success");
-          res.redirect("/books");
+          // res.redirect("/books");
         }
       }
     );
